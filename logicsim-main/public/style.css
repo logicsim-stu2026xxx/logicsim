@@ -1,0 +1,559 @@
+/* ==========================================================
+      logicsim - 逻辑仿真网站 界面美化样式表
+      简约现代 / 柔和低饱和配色 / 圆角按钮 / hover 动画 / 面板阴影
+      仅修改视觉表现，不影响任何电路逻辑与交互功能
+      ========================================================== */
+
+   /* ---------- 字体（保留原项目字体，缺失时回退系统字体） ---------- */
+   @font-face {
+       font-family: 'TsangerYuYangT03';
+       src: url('./lib/TsangerYuYangT-W03.ttf') format('truetype');
+       font-weight: normal;
+       font-style: normal;
+   }
+
+   /* ---------- 设计变量（柔和低饱和配色） ---------- */
+   :root {
+       --bg: #eef2f7;                 /* 页面底色 */
+       --panel: #ffffff;              /* 面板底色 */
+       --panel-soft: #f8fafd;         /* 浅色面板 */
+       --canvas-bg: #edf2f8;          /* 画布区域底色 */
+       --text: #31415b;               /* 主文字 */
+       --muted: #7b8aa3;              /* 次要文字 */
+       --border: #e2e8f2;             /* 边框 */
+       --border-strong: #cbd6e6;
+
+       --primary: #6c9bf0;            /* 主题蓝 */
+       --primary-dark: #5786df;
+       --success: #7cc49a;            /* 柔和绿 */
+       --success-dark: #5eb183;
+       --info: #a9c3f5;               /* 柔和蓝 */
+       --info-dark: #8fafe9;
+       --warning: #f0d9a0;            /* 柔和琥珀 */
+       --warning-dark: #e4c57f* ;
+       --danger-soft: #e98a86;
+
+       --shadow-sm: 0 1px 3px rgba(30, 60, 100, .08);
+       --shadow-md: 0 4px 16px rgba(30, 60, 100, .10);
+       --shadow-lg: 0 8px 28px rgba(30, 60, 100, .14apse);
+       --radius-sm: 6px;
+       --radius-md: 10px;
+       --radius-lg: 14px;
+       --transition: all .22s ease;
+   }
+
+   /* ---------- 基础重置 ---------- */
+   * {
+       box-sizing: border-box;
+   }
+
+   html, body, .joint-app {
+       width: 100%;
+       height: 100%;
+       margin: 0;
+       padding: 0;
+   }
+
+   body {
+       -webkit-user-select: none;
+       -moz-user-select: -moz-none;
+       user-select: none;
+       font-family: 'TsangerYuYangT03', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif, Arial;
+       overflow: hidden;
+       display: block;
+       background: var(--bg);
+       color: var(--text);
+   }
+
+   /* ---------- 自定义滚动条（现代简约） ---------- */
+   ::-webkit-scrollbar {
+       width: 9px;
+       height: 9px;
+   }
+   ::-webkit-scrollbar-track {
+       background: transparent;
+   }
+   ::-webkit-scrollbar-thumb {
+       background: #c6d0e0;
+       border-radius: 8px;
+       border: 2px solid transparent;
+       background-clip: content-box;
+   }
+   ::-webkit-scrollbar-thumb:hover {
+       background: #a8b5cb;
+       background-clip: content-box;
+       border: 2px solid transparent;
+   }
+
+   /* ==========================================================
+      整体布局：Flex 纵向，适配不同浏览器窗口大小
+      （保持头部150 / 迷你地图300x150 / 右侧300 / 底部150 与 JS 一致）
+      ========================================================== */
+   .joint-app {
+       display: flex;
+       flex-direction: column;
+       height: 100vh;
+       width: 100vw;
+       overflow: hidden;
+       background: var(--bg);
+   }
+
+   /* ---------- 顶部工具栏区 ---------- */
+   .app-header {
+       flex: 0 0 150px;
+       position: relative;
+       width: 100%;
+       overflow: hidden;
+       background: linear-gradient(180deg, #ffffff, #f3f6fb);
+       border-bottom: 1px solid var(--border);
+       box-shadow: var(--shadow-md);
+       z-index: 20;
+   }
+
+   /* ---------- 主体工作区（自适应剩余高度） ---------- */
+   .app-body {
+       flex: 1 1 auto;
+       position: relative;
+       min-height: 0;               /* 允许 flex 子项收缩，适配小窗口 */
+       height: auto;
+       overflow: hidden;
+   }
+
+   /* ==========================================================
+      迷你地图
+      ========================================================== */
+   .mini-map {
+       display: inline-block;
+       width: 300px;
+       height: 150px;
+       padding: 10px;
+       background: linear-gradient(180deg, #fbfcff, #f2f6fc);
+       border-right: 1px solid var(--border);
+       box-shadow: inset 0 0 12px rgba(30, 60, 100, .05);
+       position: relative;
+   }
+
+   /* 迷你画布容器 */
+   #mini-paper {
+       border-radius: var(--radius-sm);
+       overflow: hidden;
+       background: #f0f5fb;
+       box-shadow: var(--shadow-sm);
+   }
+
+   /* 小地图视口框（覆盖 JS 内联边框色，保持主题一致） */
+   #mini-view {
+       border-color: var(--primary) !important;
+       border-radius: var(--radius-sm);
+       box-shadow: 0 0 0 1px rgba(108, 155, 240, .25), var(--shadow-sm);
+       transition: var(--transition);
+   }
+
+   /* 迷你地图缩放手柄 */
+   #mini-resize {
+       position: absolute;
+       right: 0;
+       bottom: 0;
+       width: 11px;
+       height: 11px;
+       cursor: nwse-resize;
+       margin: 0 -3px -3px 0;
+       border-radius: 50%;
+       border: 2px solid var(--primary) !important;
+       background-color: #ffffff;
+       box-shadow: 0 1px 4px rgba(30, 60, 100, .25);
+       transition: var(--transition);
+   }
+   #mini-resize:hover {
+       transform: scale(1.25);
+       background-color: var(--primary);
+   }
+
+   /* ---------- 顶部工具栏内容区 ---------- */
+   .title-container {
+       display: inline-block;
+       position: absolute;
+       height: 100%;
+       left: 300px;
+       right: 0;
+       top: 0;
+       box-sizing: border-box;
+       background: transparent;
+       z-index: 10;
+       overflow: auto;
+       padding: 8px 14px;
+   }
+
+   /* 工具栏内两列留白 */
+   .title-container > div {
+       padding: 0 4px;
+   }
+
+   /* ==========================================================
+      按钮：圆角 + hover 悬浮动画 + 柔和配色
+      ========================================================== */
+   .w3-btn {
+       border-radius: var(--radius-md);
+       border: none;
+       cursor: pointer;
+       font-family: inherit;
+       letter-spacing: .3px;
+       box-shadow: var(--shadow-sm);
+       transition: var(--transition);
+       user-select: none;
+   }
+   .w3-btn:hover {
+       transform: translateY(-2px);
+       box-shadow: var(--shadow-md);
+       filter: brightness(1.02);
+   }
+   .w3-btn:active {
+       transform: translateY(0);
+       box-shadow: var(--shadow-sm);
+       filter: brightness(.97);
+   }
+
+   /* --- 绿色按钮：载入文本 / 文本转图 --- */
+   .w3-light-green {
+       background-color: var(--success) !important;
+       color: #17402a !important;
+   }
+   .w3-hover-green:hover {
+       background-color: var(--success-dark) !important;
+       color: #ffffff !important;
+   }
+
+   /* --- 蓝色按钮：保存文本 / 图转文本 --- */
+   .w3-light-blue {
+       background-color: var(--info) !important;
+       color: #1d3a6b !important;
+   }
+   .w3-hover-blue:hover {
+       background-color: var(--info-dark) !important;
+       color: #ffffff !important;
+   }
+
+   /* --- 琥珀按钮：解析文本 / 保存修改 --- */
+   .w3-yellow {
+       background-color: var(--warning) !important;
+       color: #54430f !important;
+   }
+   .w3-hover-deep-orange:hover {
+       background-color: var(--warning-dark) !important;
+       color: #3d2f08 !important;
+   }
+
+   /* 解析文本按钮与行内间距 */
+   .title-container .w3-yellow {
+       margin-top: 6px;
+   }
+
+   /* 文本转图 / 图转文本 按钮 */
+   #LoadButton,
+   #SaveButton {
+       border-radius: var(--radius-md);
+       margin-top: 6px;
+       font-weight: 600;
+   }
+
+   /* ==========================================================
+      输入框 & 文本框：圆角 + 聚焦高亮
+      ========================================================== */
+   .w3-input,
+   input[type="text"] {
+       border: 1px solid var(--border) !important;
+       border-radius: var(--radius-md);
+       padding: 6px 10px;
+       font-family: inherit;
+       font-size: 13px;
+       color: var(--text);
+       background: var(--panel);
+       outline: none;
+       transition: var(--transition);
+   }
+   .w3-input:focus,
+   input[type="text"]:focus {
+       border-color: var(--primary) !important;
+       box-shadow: 0 0 0 3px rgba(108, 155, 240, .18);
+   }
+
+   /* 逆波兰表达式输入框 */
+   #ReversePol {
+       width: 100%;
+       height: 60px;
+       border: 1px solid var(--border) !important;
+       border-radius: var(--radius-md);
+       padding: 8px 10px;
+       font-family: 'Consolas', 'JetBrains Mono', 'Courier New', monospace;
+       font-size: 13px;
+       color: var(--text);
+       background: var(--panel-soft);
+       resize: vertical;
+       outline: none;
+       transition: var(--transition);
+   }
+   #ReversePol:focus {
+       border-color: var(--primary) !important;
+       box-shadow: 0 0 0 3px rgba(108, 155, 240, .18);
+   }
+
+   /* JSON 模型文本框 */
+   #myModel {
+       width: 100%;
+       height: 100px;
+       border: 1px solid var(--border) !important;
+       border-radius: var(--radius-md);
+       padding: 8px 10px;
+       font-family: 'Consolas', 'JetBrains Mono', 'Courier New', monospace;
+       font-size: 12px;
+       line-height: 1.5;
+       color: var(--text);
+       background: var(--panel-soft);
+       resize: vertical;
+       outline: none;
+       transition: var(--transition);
+       white-space: pre;
+   }
+   #myModel:focus {
+       border-color: var(--primary) !important;
+       box-shadow: 0 0 0 3px rgba(108, 155, 240, .18);
+   }
+
+   /* 元素备注文本框 */
+   #ERMemo {
+       width: 100%;
+       min-height: 60px;
+       border: 1px solid var(--border) !important;
+       border-radius: var(--radius-md);
+       padding: 8px 10px;
+       font-family: inherit;
+       font-size: 13px;
+       color: var(--text);
+       background: var(--panel-soft);
+       resize: vertical;
+       outline: none;
+       transition: var(--transition);
+   }
+   #ERMemo:focus {
+       border-color: var(--primary) !important;
+       box-shadow: 0 0 0 3px rgba(108, 155, 240, .18);
+   }
+
+   /* ==========================================================
+      左侧窄条
+      ========================================================== */
+   .left-container {
+       position: absolute;
+       left: 0;
+       top: 0;
+       width: 10px;
+       height: 100%;
+       overflow: auto;
+       background: linear-gradient(180deg, #ffffff, #f0f4fa);
+       border-right: 1px solid var(--border);
+       z-index: 10;
+   }
+
+   /* ==========================================================
+      主画布区
+      ========================================================== */
+   .main-container {
+       position: absolute;
+       top: 0;
+       left: 10px;
+       right: 306px;
+       bottom: 150px;
+       overflow: hidden;
+       background: var(--canvas-bg);
+       border: 1px solid var(--border-strong);
+       border-radius: var(--radius-md);
+       box-shadow: inset 0 0 24px rgba(30, 60, 100, .06), var(--shadow-sm);
+       box-sizing: border-box;
+   }
+
+   /* 画布容器（尺寸由 JS 控制，此处仅保证不溢出） */
+   #paper-container {
+       overflow: hidden;
+   }
+
+   /* 画布本身 */
+   #paper {
+       cursor: grab;
+   }
+   #paper:active {
+       cursor: grabbing;
+   }
+
+   /* ==========================================================
+      右侧分栏拖拽手柄
+      ========================================================== */
+   #app-resize {
+       position: absolute;
+       top: 0;
+       width: 8px;
+       right: 300px;
+       bottom: 150px;
+       background-color: transparent;
+       cursor: ew-resize;
+       z-index: 15;
+   }
+   #app-resize::after {
+       content: "";
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+       width: 4px;
+       height: 46px;
+       border-radius: 4px;
+       background-color: #cfd8e6;
+       transition: var(--transition);
+   }
+   #app-resize:hover::after {
+       background-color: var(--danger-soft);
+       height: 70px;
+       box-shadow: 0 2px 8px rgba(30, 60, 100, .2);
+   }
+
+   /* ==========================================================
+      右侧属性检查面板
+      ========================================================== */
+   .right-container {
+       position: absolute;
+       top: 0;
+       right: 0;
+       width: 300px;
+       bottom: 150px;
+       box-sizing: border-box;
+       overflow-y: auto;
+       overflow-x: hidden;
+       background: var(--panel);
+       border-left: 1px solid var(--border);
+       box-shadow: -4px 0 18px rgba(30, 60, 100, .08);
+       padding: 14px 14px 20px;
+   }
+
+   /* 属性行：标签 + 输入 */
+   .right-container .w3-row {
+       margin-bottom: 12px;
+   }
+   .right-container .w3-third {
+       font-size: 13px;
+       color: var(--muted);
+       line-height: 32px;
+       padding-right: 6px;
+   }
+   .right-container .w3-twothird {
+       width: 66%;
+   }
+
+   /* 保存修改按钮 */
+   #ERSetName {
+       margin: 4px 0 16px;
+       font-weight: 600;
+   }
+
+   /* 右侧使用说明卡片 */
+   .right-container > div:last-child {
+       background: linear-gradient(180deg, #f7faff, #f1f6fd);
+       border: 1px solid var(--border);
+       border-radius: var(--radius-md);
+       padding: 12px 14px;
+       font-size: 12px;
+       line-height: 1.9;
+       color: var(--muted);
+       box-shadow: var(--shadow-sm);
+   }
+   .right-container > div:last-child br {
+       display: none;
+   }
+
+   /* ==========================================================
+      底部状态栏
+      ========================================================== */
+   .bottom-container {
+       position: absolute;
+       right: 0;
+       bottom: 0;
+       left: 10px;
+       width: auto;
+       height: 150px;
+       background: linear-gradient(180deg, #ffffff, #f3f6fb);
+       border-top: 1px solid var(--border);
+       box-shadow: 0 -4px 18px rgba(30, 60, 100, .07);
+       z-index: 10;
+   }
+
+   /* 状态文本 */
+   #status {
+       margin: 8px 0 0 14px;
+       font-size: 13px;
+       color: var(--muted);
+       letter-spacing: .3px;
+   }
+
+   /* ==========================================================
+      Select2 下拉（随页面载入，统一风格）
+      ========================================================== */
+   .select2-container .select2-selection--single {
+       height: 34px;
+       border: 1px solid var(--border);
+       border-radius: var(--radius-md);
+       outline: none;
+   }
+   .select2-container--default .select2-selection--single .select2-selection__rendered {
+       line-height: 32px;
+       color: var(--text);
+       font-size: 13px;
+   }
+   .select2-container--default .select2-selection--single .select2-selection__arrow {
+       height: 32px;
+   }
+   .select2-dropdown {
+       border: 1px solid var(--border);
+       border-radius: var(--radius-md);
+       box-shadow: var(--shadow-md);
+       overflow: hidden;
+   }
+
+   /* ==========================================================
+      自适应：不同浏览器窗口大小
+      （几何布局由 JS 控制保持不变，这里优化字体与留白）
+      ========================================================== */
+   @media (max-width: 900px) {
+       .title-container {
+           padding: 8px 10px;
+       }
+       .right-container {
+           padding: 12px 10px 16px;
+       }
+       .right-container > div:last-child {
+           font-size: 11px;
+       }
+   }
+
+   @media (max-width: 640px) {
+       .app-header {
+           flex-basis: 140px;
+       }
+       .mini-map {
+           padding: 6px;
+       }
+       .w3-btn {
+           font-size: 12px;
+           padding: 6px 10px;
+       }
+   }
+
+   @media (max-height: 700px) {
+       .title-container {
+           padding-top: 4px;
+           padding-bottom: 4px;
+       }
+       #myModel {
+           height: 80px;
+       }
+       .right-container {
+           padding-top: 8px;
+       }
+   }
